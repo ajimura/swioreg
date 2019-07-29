@@ -17,7 +17,7 @@
 #include <asm/io.h>
 #include "swioreg.h"
 
-#define VERB 0
+#define VERB 1
 #define MAX_REF 4
 
 struct swioreg_devinfo {
@@ -70,6 +70,8 @@ static int swioreg_open(struct inode *inode, struct file *file)
 
   csr=ioremap_nocache(CSR_BASE,CSR_SPAN);
   swioreg->csr_ptr=csr;
+
+  printk(KERN_DEBUG "ioremap at %p\n",csr);
 
   swioreg->major=major;
   swioreg->minor=minor;
@@ -138,7 +140,7 @@ static long swioreg_ioctl(
     if (copy_to_user((int __user *)arg, &cmd_mem, sizeof(cmd_mem))){
       retval = -EFAULT; goto done; }
 #if VERB
-    printk(KERN_DEBUG "(%d)IOR_cmd.val/addr %08x %08x(%s)\n",minor,cmd_mem.val,address, __func__);
+    printk(KERN_DEBUG "IOR_cmd.val/addr %08x %08x %p(%s)\n",cmd_mem.val,address,csrtop+address, __func__);
 #endif
     break;
 
@@ -147,7 +149,7 @@ static long swioreg_ioctl(
     iowrite32(cmd_mem.val,csrtop+address);
     wmb();
 #if VERB
-    printk(KERN_DEBUG "(%d)IOW_cmd.val/addr %08x %08x(%s)\n",minor,cmd_mem.val,address, __func__);
+    printk(KERN_DEBUG "IOW_cmd.val/addr %08x %08x %p(%s)\n",cmd_mem.val,address,csrtop+address, __func__);
 #endif
     break;
 
