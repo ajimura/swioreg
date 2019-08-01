@@ -17,7 +17,7 @@
 #include <asm/io.h>
 #include "swioreg.h"
 
-#define VERB 1
+#define VERB 0
 #define MAX_REF 4
 
 struct swioreg_devinfo {
@@ -58,7 +58,7 @@ static int swioreg_open(struct inode *inode, struct file *file)
     refcount++;
   }
 
-  printk(KERN_DEBUG DRV_NAME "_open(): %d:%d %lu/%d\n",major,minor,jiffies,HZ);
+  printk(KERN_DEBUG DRV_NAME "_open(): %d:%d %lu/%d ref=%d\n",major,minor,jiffies,HZ,refcount);
 
   swioreg = (struct swioreg_dev *)kzalloc(sizeof(struct swioreg_dev), GFP_KERNEL);
   if (!swioreg) {
